@@ -1,6 +1,6 @@
 # remote_open
 
-## 引子
+## 动机
 
 使用ssh连接服务器，不可避免会有用本地的软件开远程文件的需求，比如查看远程图片，或用本地文本编辑器打开远程文件。
 
@@ -101,6 +101,22 @@ zsh 【remote_open repo的绝对路径】/remote_open_listen.sh
 
 [操作图文教程详见](https://www.jianshu.com/p/799e3769fb92)
 
+* 然后重启电脑试试，看看是否开机自启
+
+  ```
+  lsof -i:【本地nc端口】
+  ```
+
+  若显示如下，则自启成功
+
+  ```
+  COMMAND  PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+  nc      4240  mac    3u  IPv4 0xa8a6a45ca35153d5      0t0  TCP *:8304 (LISTEN)
+  ```
+
 ##### windows用户
 
 请自行查找windows设置开机自动运行脚本的方法
+
+
+
