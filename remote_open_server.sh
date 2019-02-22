@@ -2,7 +2,7 @@
 
 sever_port=8304 # 【远程nc端口】
 
-subnc(){
+rsubl(){
     dirs=""
     for arg in $@; do
         if [ -e $arg ]; then
@@ -20,7 +20,7 @@ subnc(){
     fi
 }
 
-opennc(){
+ropen(){
     dirs=""
     for arg in $@; do
         if [ -e $arg ]; then

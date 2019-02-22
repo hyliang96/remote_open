@@ -1,122 +1,121 @@
 # remote_open
 
-## 动机
+## Motivation
 
-使用ssh连接服务器，不可避免会有用本地的软件开远程文件的需求，比如查看远程图片，或用本地文本编辑器打开远程文件。
+When ssh a remote server, it's oftnen necessary to open remote files or folders with local softwares, e.g. to edit codes with local editor, and show images.
 
-显然，此时得将远程文件传达本地，手段不一而足，scp、sftp、rsycn、sshfs等等。然而，不论哪一种，都需要开着两个窗口，一个是ssh连接服务器的终端，一个是用来敲传文件命令的终端。更麻烦的是，得对着前者的服务器ip、用户名、文件路径，来敲后者的命令。要知道，在本地，我们只需要输入`open <file_path(s) or dir_path(s)>`就能一键打开文件（夹）。
+To do this, we usually synchronizes files with tools like scp, sftp, rsycn, sshfs, etc. However, everytime opening a remote files, you need fetch its path from terminal, and synchronize it to your local computer, and then open the files  with s local software. This workflow is time comsuming.
 
-为了免去上述体力劳动，我实现了`remote open`工具，可以像在本地用`open`命令一样，一键打开远程文件(夹)。
+With this tool, you only need type one command on remote terminal, thus the remote files or folders will be opened locally, just like use `open` command on local terminal.
 
-## 介绍
+## Introduction
 
-### 功能
-ssh连到服务器后，对着远程的终端:
+### Uasge
 
-* 输入`opennc <file_path(s) or dir_path(s)>`，根据文件后缀本，自动选用地软件，打开远程的文件（夹）
-* 输入 `subnc <file_path(s) or dir_path(s)>`，用本地sublime，自动打开远程的文件（夹）。（你也可以修改代码，换成你喜欢的文本编辑器）
+ssh a remote serevr, type in terminal:
 
-本脚本自动用sshfs挂载远程目录，无需手动同步文件
+* `ropen <file_path(s) or dir_path(s)>`: open with local softwares according to suffixes
+* `rsubl <file_path(s) or dir_path(s)>`: open with local sublime
+* you can edit the code to enable more local softwares
 
-### 依赖
-  * 服务器：nc
-  * 本地：nc、ssh、sshfs、zsh
+This tool mount remote path with sshfs, so you don't need to sysynchronize manually
 
-### 文件夹构成与工作原理
-* `remote_open_server.sh`: 远程将 [ 【hostname】、【username】、<file_path(s) or dir_path(s)>之绝对路径]，由`nc`发送到本地
+### Dependence
 
-* `easy_sshfs.sh`: 封装sshfs，使之更加方便使用
-* `remote_open.sh`: 根据远程`nc`所发，自动sshfs挂载远程文件，并用本地`open`打开
-* `remote_open_listen.sh`: 侦听远程`nc`所发，调用`remote_open.sh`
-* `remote_open.app`：将`remote_open_listen.sh`封装成OSX上的app，以供开机后台自启
+* remote: nc
+* local: nc, ssh, sshfs, zsh
 
-## 配置
+### How it works
+* `remote_open_server.sh`: send remote  [ <hostname>, <username>, absoltue paths of file(s) or folder(s)>] to local by `nc` through ssh port forwarding
 
-### 变量
+* `easy_sshfs.sh`: make sshfs easier to use
+* `remote_open.sh`: according to the remote message, sshfs <username>@<hostname>:/, open the files or folders with local `open`
+* `remote_open_listen.sh`: listen remote messages, and call `remote_open.sh`
+* `remote_open.app`: a OSX app, call `remote_open_listen.sh`, can be set as a startup item, 
 
-【本地nc端口】 ：选个冷门端口
+## Installation
 
-【本地nc端口】  ：选个冷门端口
+### Arguements
 
-【本地挂载路径】：自己键一个文件夹，其下是各台服务器，由sshfs挂载过来的目录们
+<local nc port>  <remote nc port> : sugguest you to choose the which are not often used 
 
-### 远程
+<local mount dir>: a local dir, under which are all sshfs mounting points
 
-将`remote_open_server.sh`复制到服务器`~/`下
-
-在~/.bashrc，添加以下代码
+### Remote
 
 ```bash
-[ -f ~/remote_open_server.sh ] && . ~/remote_open_server.sh
+git clone https://github.com/hyliang96/remote_open.git
+cp remote_open/remote_open_server.sh ~ 
+# or copy to anywhere you like
+echo "[ -f ~/remote_open_server.sh ] && . ~/remote_open_server.sh" >> ~/.bashrc
+# or add to .zshrc if you use it
 ```
 
-在`remote_open_server.sh`中修改
+edit `remote_open_server.sh`, to set <local nc port>
 
 ```bash
-sever_port=【远程nc端口】# 建议选个冷门端口
+sever_port=<remote nc port>
 ```
 
-### 本地
+### Local
 
-####  修改配置
+####  Configuration
 
-在`config.sh`中设置
+edit  `config.sh` 
 
 ```bash
-mount_dir=【本地挂载路径】 # 自己键一个文件夹，其下是各台服务器，由sshfs挂载过来的目录们
-port=【本地nc端口】 # 建议选个冷门端口
+mount_dir=<local mount dir>
+port=<local nc port>
 ```
 
-#### 设置.ssh/config，进行端口转发
+#### Edit .ssh/config
 
-为使服务器上nc发送消息到本地被监听到，ssh需将【远程nc端口】同【本地nc端口】转发
+To connect remote nc and local nc, use ssh to forward the port:
 
 ~~~ssh
-Host 【hostname】
-    HostName 【服务器的外网ip 或 url】
-    User 【username】
-    # 私钥
+Host <hostname>
+    HostName <remote ip or url>
+    User <username>
     IdentityFile ~/.ssh/id_rsa
     PreferredAuthentications publickey
-    # 用于remote open 的端口转发
-    RemoteForward 【远程nc端口】 localhost:【本地nc端口】
-   # 其他设置...
+    # port forwarding for remote open
+    RemoteForward <remote nc port> localhost:<local nc port>
+    # other configs ...
 ~~~
-其中 
-* 【hostname】=服务器上执行`hostname`的输出
-* 【username】=服务器上执行`echo $USER`的输出
-* 【服务器的外网ip 或 url】=服务器上执行`curl ifconfig.me`的输出
+* <hostname>=the output of `hostname` on remote
+* <username>=the output of `echo $USER` on remote
+* <remote ip or url>==the output of `curl ifconfig.me` on remote
 
-#### 设端口监听脚本为开机自启
-将端口监听脚本`remote_open/remote_open_listen.sh`设置为开机自启、后台运行
+#### Set as startup iterm
+to run  `remote_open_listen.sh` on background when startuping local computer
 
-##### mac用户
-* 用mac自带程序 “自动操作.app”打开 `remote_open.app`，修改下述路径
+##### Mac
+* open  `remote_open.app` with `Automator.app`, and change the path below
 ~~~zsh
 ( ( 
-zsh 【remote_open repo的绝对路径】/remote_open_listen.sh
+zsh <absolute path to remote_open repo>/remote_open_listen.sh
 ) &) > /dev/null 2>&1
 ~~~
-* 在`系统偏好设置/用户与群组/登录项`，将`remote_open/remote_open.app`选中，并勾选`隐藏`，设为开机启动项目。
+* `system preferences/user and group/startup items`，add `remote_open/remote_open.app`
 
-[操作图文教程详见](https://www.jianshu.com/p/799e3769fb92)
+  [for more instruction](https://www.jianshu.com/p/799e3769fb92)
 
-* 然后重启电脑试试，看看是否开机自启
+* restart the computer to test if the  `remote_open_listen.sh`  is runing
 
   ```
-  lsof -i:【本地nc端口】
+  lsof -i:<local nc port>
   ```
 
-  若显示如下，则自启成功
+  if it returns below,   `remote_open_listen.sh`  is runing
 
   ```
   COMMAND  PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
   nc      4240  mac    3u  IPv4 0xa8a6a45ca35153d5      0t0  TCP *:8304 (LISTEN)
   ```
 
-##### windows用户
+##### Windows
 
-请自行查找windows设置开机自动运行脚本的方法
+set  `remote_open_listen.sh`  as startup item on your own :)
 
 
 

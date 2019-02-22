@@ -7,5 +7,3 @@
 mount_dir="/Users/mac/Desktop/mount"
 # 【本地nc端口】
 port=8304
-
-
