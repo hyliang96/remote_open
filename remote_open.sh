@@ -4,7 +4,7 @@ this_dir_abs_path=$(cd "$(dirname "$0")"; pwd)
 . $this_dir_abs_path/easy_sshfs.sh
 . $this_dir_abs_path/config.sh
 
-debug=0     # 需要debug输出设为1
+debug=1     # 需要debug输出设为1
 
 string="$1"
 
@@ -31,10 +31,10 @@ mounts=("${(@s/\\n/)mounts}")
 
 mount_folder=$user@$host_alias
 
-if ! [[ ${mounts} =~ $mount_folder:/ ]] || ! [ -d $mount_dir/$host_alias/home ]; then
+if ! [[ ${mounts} =~ $mount_folder:/ ]] || ! [ -d $mount_dir/$mount_folder/home ]; then
     [ $debug -ne 0 ] && echo hasnt mounted $mount_folder:/, start mounting
-    [ $debug -ne 0 ] && echo fs $mount_folder /
-    fs $mount_folder /
+    [ $debug -ne 0 ] && echo easy_sshfs $mount_folder /
+    easy_sshfs $mount_folder /
     [ $debug -ne 0 ] && echo finished mounting
 else
     [ $debug -ne 0 ] && echo has mounted $mount_folder:/
