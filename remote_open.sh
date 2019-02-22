@@ -4,7 +4,7 @@ this_dir_abs_path=$(cd "$(dirname "$0")"; pwd)
 . $this_dir_abs_path/easy_sshfs.sh
 . $this_dir_abs_path/config.sh
 
-debug=1     # 需要debug输出设为1
+debug=0     # 需要debug输出设为1
 
 string="$1"
 
