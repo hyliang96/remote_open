@@ -33,8 +33,8 @@ mount_folder=$user@$host_alias
 
 if ! [[ ${mounts} =~ $mount_folder:/ ]] || ! [ -d $mount_dir/$mount_folder/home ]; then
     [ $debug -ne 0 ] && echo hasnt mounted $mount_folder:/, start mounting
-    [ $debug -ne 0 ] && echo easy_sshfs $mount_folder /
-    easy_sshfs $mount_folder /
+    [ $debug -ne 0 ] && echo fs $mount_folder /
+    fs $mount_folder /
     [ $debug -ne 0 ] && echo finished mounting
 else
     [ $debug -ne 0 ] && echo has mounted $mount_folder:/
@@ -78,6 +78,7 @@ if [ "$open_with" = "" ]; then
         open  $folder
     done
     if [ $#files -ne 0 ]; then
+        [ $debug -ne 0 ] && echo $files
         open $files
     fi
 else
@@ -87,6 +88,7 @@ else
         open -a $open_with $folder
     done
     if [ $#files -ne 0 ]; then
+        [ $debug -ne 0 ] && echo $files
         open -a $open_with $files
     fi
 fi
