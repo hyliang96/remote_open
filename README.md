@@ -1,5 +1,7 @@
 # remote_open
 
+中文readme请`git checkout chinse_version`
+
 ## Motivation
 
 When ssh a remote server, it's oftnen necessary to open remote files or folders with local softwares, e.g. to edit codes with local editor, and show images.
