@@ -28,10 +28,10 @@ This tool mount remote path with sshfs, so you don't need to sysynchronize manua
 * local: nc, ssh, sshfs, zsh
 
 ### How it works
-* `remote_open_server.sh`: send remote  [ <hostname>, <username>, absoltue paths of file(s) or folder(s)>] to local by `nc` through ssh port forwarding
+* `remote_open_server.sh`: send remote  [ \<hostname>, \<username>, absoltue paths of file(s) or folder(s)>] to local by `nc` through ssh port forwarding
 
 * `easy_sshfs.sh`: make sshfs easier to use
-* `remote_open.sh`: according to the remote message, sshfs <username>@<hostname>:/, open the files or folders with local `open`
+* `remote_open.sh`: according to the remote message, sshfs \<username>@\<hostname>:/, open the files or folders with local `open`
 * `remote_open_listen.sh`: listen remote messages, and call `remote_open.sh`
 * `remote_open.app`: a OSX app, call `remote_open_listen.sh`, can be set as a startup item, 
 
@@ -39,9 +39,9 @@ This tool mount remote path with sshfs, so you don't need to sysynchronize manua
 
 ### Arguements
 
-<local nc port>  <remote nc port> : sugguest you to choose the which are not often used 
+\<local nc port>  \<remote nc port> : sugguest you to choose the which are not often used 
 
-<local mount dir>: a local dir, under which are all sshfs mounting points
+\<local mount dir>: a local dir, under which are all sshfs mounting points
 
 ### Remote
 
@@ -53,7 +53,7 @@ echo "[ -f ~/remote_open_server.sh ] && . ~/remote_open_server.sh" >> ~/.bashrc
 # or add to .zshrc if you use it
 ```
 
-edit `remote_open_server.sh`, to set <local nc port>
+edit `remote_open_server.sh`, to set \<local nc port>
 
 ```bash
 sever_port=<remote nc port>
@@ -84,9 +84,9 @@ Host <hostname>
     RemoteForward <remote nc port> localhost:<local nc port>
     # other configs ...
 ~~~
-* <hostname>=the output of `hostname` on remote
-* <username>=the output of `echo $USER` on remote
-* <remote ip or url>==the output of `curl ifconfig.me` on remote
+* \<hostname>=the output of `hostname` on remote
+* \<username>=the output of `echo $USER` on remote
+* \<remote ip or url>==the output of `curl ifconfig.me` on remote
 
 #### Set as startup iterm
 to run  `remote_open_listen.sh` on background when startuping local computer
