@@ -1,6 +1,7 @@
 #!/bin/bash
 
-this_dir_abs_path=$(cd "$(dirname "$0")"; pwd)
+this_dir_abs_path=$(cd "$(dirname "${BASH_SOURCE[0]-$0}")"; pwd)
+
 . $this_dir_abs_path/easy_sshfs.sh
 . $this_dir_abs_path/config.sh
 
