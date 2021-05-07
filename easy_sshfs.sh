@@ -64,8 +64,29 @@ ufs()  # ufs [[用户名@]host别名 | 用户名@网址 ] （一个或多个）
 # 列出目前mount的所有磁盘
 fsls()
 {
-    answer=`pgrep -lf sshfs | awk '{print $1 "  " $3}'`
-    if [ "$answer" != "" ]; then echo "pid   host_alias:remote_path"; echo $answer; fi
+    local hadopt=false
+    [ -n "$ZSH_VERSION" ] && [ "$(setopt | grep shwordsplit)" != '' ] && \
+        hadopt=true && setopt sh_word_split # 若为 zsh则开sh_word_split选项
+    local OLD_IFS="$IFS" ; IFS=$'\n' # "【分割字符】"  # 必需是单个字符，但可以是汉字
+    # 如果是转义字符需加 $'\某'，如换行，需要写成  $'\n'
+    local tmp=($(pgrep -lf sshfs))
+    IFS="$OLD_IFS"
+    [ -n "$ZSH_VERSION" ] && [ "$hadopt" = false ] && unsetopt sh_word_split # 若原先没开此选项则关之
+
+    answer=()
+    for line in "${tmp[@]}"; do
+        local pid="$(echo $line | awk '{print $1}')"
+        local remotehost="$(echo $line | awk -F : '{print $1}' | awk '{print $NF}')"
+        local remotedir="$(echo $line | awk -F : '{print $2}' | awk '{print $1}')"
+        answer+=("$pid   $remotehost:$remotedir")
+    done
+    if [ ${#answer} -ne 0 ]; then
+        echo "pid     host_alias:remote_path"
+        for line in "${answer[@]}"; do
+            echo "$line"
+        done
+    fi
+    # if [ "$answer" != "" ]; then echo "pid   host_alias:remote_path"; echo $answer; fi
 }
 # 列出挂载路径
 fsdir()

@@ -59,8 +59,8 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>( ( 
-zsh /Users/mac/Desktop/remote_open/remote_open_listen.sh
+					<string>( (
+zsh /Users/mac/Desktop/终端脚本/remote_open/remote_open_listen.sh
 ) &amp;) &gt; /dev/null 2&gt;&amp;1</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
