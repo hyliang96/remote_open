@@ -69,7 +69,8 @@ ufs()  # ufs [[用户名@]host别名 | 用户名@网址 ] （一个或多个）
 
 # 自动补全
 current_shell=$(ps -p $$ -o comm=)
-if [[ "$current_shell" == "-zsh" ]] && [  "$(command -v compdef)" != '' ] ; then
+if [[ "$current_shell" == "-zsh" ]] && ( command -v compdef &>/dev/null ) ; then
+    #  当前是交互式zsh 且存在compdef命令
     # -zsh 表示交互式zsh
     _ufs_zsh_completion() {
         # 列出$mount_dir目录下的所有子文件夹
@@ -77,8 +78,8 @@ if [[ "$current_shell" == "-zsh" ]] && [  "$(command -v compdef)" != '' ] ; then
         _describe 'directory' dirs
     }
     compdef _ufs_zsh_completion ufs
-elif [[ "$current_shell" == "bash" ]]; then
-    # 不论交互还是非交互式bash
+elif [[ "$current_shell" == "bash" ]]  && ( command -v compdef &>/dev/null ); then
+    #  当前是bash（不论交互还是非交互式） 且存在compdef命令
     _ufs_bash_completion() {
         local cur prev opts
         cur="${COMP_WORDS[COMP_CWORD]}"
