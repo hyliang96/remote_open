@@ -78,8 +78,8 @@ if [[ "$current_shell" == "-zsh" ]] && ( command -v compdef &>/dev/null ) ; then
         _describe 'directory' dirs
     }
     compdef _ufs_zsh_completion ufs
-elif [[ "$current_shell" == "bash" ]]  && ( command -v compdef &>/dev/null ); then
-    #  当前是bash（不论交互还是非交互式） 且存在compdef命令
+elif [[ "$current_shell" == "bash" ]]  && ( command -v complete &>/dev/null ); then
+    #  当前是bash（不论交互还是非交互式） 且存在complete命令
     _ufs_bash_completion() {
         local cur prev opts
         cur="${COMP_WORDS[COMP_CWORD]}"
