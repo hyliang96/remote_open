@@ -69,7 +69,7 @@ ufs()  # ufs [[用户名@]host别名 | 用户名@网址 ] （一个或多个）
 
 # 自动补全
 current_shell=$(ps -p $$ -o comm=)
-if [[ "$current_shell" == "-zsh" ]]; then
+if [[ "$current_shell" == "-zsh" ]] && [  "$(command -v compdef)" != '' ] ; then
     # -zsh 表示交互式zsh
     _ufs_zsh_completion() {
         # 列出$mount_dir目录下的所有子文件夹
