@@ -7,7 +7,7 @@ this_dir_abs_path=$(cd "$(dirname "${BASH_SOURCE[0]-$0}")"; pwd)
 . $this_dir_abs_path/code-remote.sh
 
 
-debug=0     # 需要debug输出设为1
+debug=0    # 需要debug输出设为1
 
 string="$1"
 
@@ -33,32 +33,33 @@ if [ "$app" = "code" ]; then
 else
     # 需要sshfs挂载远端目录
 
-    mounts="$(pgrep -lf sshfs | awk '{print $3}')"
-    mounts=("${(@s/\\n/)mounts}")
+    mounts="$(ps -o pid,args -p $(pgrep sshfs) 2>/dev/null | tail -n +2 | awk '{print $3}')"
+    mounts=("${(@s/\\n/)mounts}")  # 按换行符分割成数组
     [ $debug -ne 0 ] && echo mounts: $mounts
-
-
     [ $debug -ne 0 ] && echo mount_dir: $mount_dir
 
-    mount_folder=$user@$host_alias
+    mount_folder=$host_alias # $user@$host_alias
+    [ $debug -ne 0 ] && echo mount_folder: $mount_folder
 
     if ! [[ ${mounts} =~ $mount_folder:/ ]] || ! [ -d $mount_dir/$mount_folder/home ]; then
-        [ $debug -ne 0 ] && echo hasnt mounted $mount_folder:/, start mounting
-        [ $debug -ne 0 ] && echo fs $mount_folder /
-        fs $mount_folder /
+        [ $debug -ne 0 ] && echo hasn\'t mounted $mount_folder:/, start mounting
+        [ $debug -ne 0 ] && echo fs \"$mount_folder:/\"
+        fs "$mount_folder:/"
         [ $debug -ne 0 ] && echo finished mounting
     else
         [ $debug -ne 0 ] && echo has mounted $mount_folder:/
     fi
 
-
+    sleep 1 # 需要等一下，本地文件系统才能监测到$local_path存在
     folders=()
     files=()
 
     for remote_path in ${remote_paths}; do
         [ $debug -ne 0 ] && echo remote_path: $remote_path
-        local_path=$mount_dir/$mount_folder/$remote_path
+        local_path="$mount_dir/$mount_folder$remote_path"
         [ $debug -ne 0 ] && echo local_path: $local_path
+        # ls -d $local_path # &>/dev/null
+        # ls -d $local_path # &>/dev/null
 
         if [ -d $local_path ]; then
             [ $debug -ne 0 ] && echo local_path is dir
@@ -67,7 +68,7 @@ else
             [ $debug -ne 0 ] && echo local_path is file
             files+="$local_path"
         else
-            echo no such file or directory: $local_path
+            echo "no such file or directory: $local_path"
         fi
     done
 
@@ -86,21 +87,21 @@ else
     if [ "$open_with" = "" ]; then
         for folder in $folders; do
             # folder=${folder/ /\\ }
-            [ $debug -ne 0 ] && echo $folder
+            [ $debug -ne 0 ] && echo opening $folder
             open  $folder
         done
         if [ $#files -ne 0 ]; then
-            [ $debug -ne 0 ] && echo $files
+            [ $debug -ne 0 ] && echo opening $files
             open $files
         fi
     else
         for folder in $folders; do
             # folder=${folder/ /\\ }
-            [ $debug -ne 0 ] && echo $folder
+            [ $debug -ne 0 ] && echo opening $folder with $open_with
             open -a $open_with $folder
         done
         if [ $#files -ne 0 ]; then
-            [ $debug -ne 0 ] && echo $files
+            [ $debug -ne 0 ] && echo opening $files with $open_with
             open -a $open_with $files
         fi
     fi
