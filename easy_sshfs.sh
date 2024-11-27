@@ -81,9 +81,9 @@ if [[ "$current_shell" == "-zsh" ]] && ( command -v compdef &>/dev/null ) ; then
 elif [[ "$current_shell" == "bash" ]]  && ( command -v complete &>/dev/null ); then
     #  当前是bash（不论交互还是非交互式） 且存在complete命令
     _ufs_bash_completion() {
-        local cur prev opts
+        local cur opts # prev
         cur="${COMP_WORDS[COMP_CWORD]}"
-        prev="${COMP_WORDS[COMP_CWORD - 1]}"
+        # prev="${COMP_WORDS[COMP_CWORD - 1]}" # 当前参数前的一个参数
 
         opts=($(find $mount_dir -mindepth 1 -maxdepth 1 -type d | xargs -n1 basename ))
         # 在bash中，若子文件夹名为 user@host，则因@符号的干扰，无法显示自动补全
